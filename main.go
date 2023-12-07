@@ -50,7 +50,7 @@ func handleConnection(conn net.Conn) {
 			return
 		}
 
-		log.Printf("Received command: %v", line)
+		// log.Printf("Received command: %v", line)
 		cmd, args := parseCommand(line)
 
 		if cmd == "LOGIN" && !authenticated {
@@ -88,7 +88,7 @@ func processLogin(args string, writer *bufio.Writer) bool {
 		return false
 	}
 
-	log.Printf("Login attempt with args: %s", args)
+	// log.Printf("Login attempt with args: %s", args)
 
 	// set local variables from args into func
 	username, password := credentials[0], credentials[1]
