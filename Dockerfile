@@ -12,7 +12,7 @@ WORKDIR /app
 COPY . .
 
 # download dependancies if required
-RUN go mod download
+# RUN go mod download
 
 # compile
 RUN go build -o main .
