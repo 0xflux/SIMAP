@@ -1,6 +1,10 @@
 # use latest Go image
 FROM golang:latest
 
+# CHANGE THESE USERNAME AND PASSWORDS
+ENV simap_poc_username=defaultUsername
+ENV simap_poc_password=defaultPassword
+
 # set working directory in container
 WORKDIR /app
 

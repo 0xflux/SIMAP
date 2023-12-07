@@ -10,3 +10,14 @@ Set environment variables as follows, substituting in your desired username and 
 [System.Environment]::SetEnvironmentVariable("simap_poc_username", "exampleUser", [System.EnvironmentVariableTarget]::User)
 [System.Environment]::SetEnvironmentVariable("simap_poc_password", "examplePassword", [System.EnvironmentVariableTarget]::User)
 ```
+
+In the dockerfile, edit:
+
+```
+ENV simap_poc_username=defaultUsername
+ENV simap_poc_password=defaultPassword
+```
+
+With your chosen username and password, must match the environment of where you run ZestyChips.
+
+If you would prefer this hardcoded, please submit an issue request on Git (or Tweet me).
