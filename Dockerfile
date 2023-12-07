@@ -11,8 +11,8 @@ WORKDIR /app
 # copy dir into app
 COPY . .
 
-# copy the start script & maek executable
-RUN chmod +x start.sh
+# copy the start script & make executable
+RUN chmod +x /app/start.sh
 
 # download dependancies if required
 # RUN go mod download
