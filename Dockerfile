@@ -12,7 +12,7 @@ WORKDIR /app
 COPY . .
 
 # copy the start script & make executable
-RUN chmod +x /app/start.sh
+# RUN chmod +x /app/start.sh
 
 # download dependancies if required
 # RUN go mod download
@@ -20,5 +20,6 @@ RUN chmod +x /app/start.sh
 # compile
 RUN go build -o main .
 
-# start the IMAP server via the  shellscript
-CMD ["/app/start.sh"]
+# start the IMAP server
+#CMD ["/app/start.sh"]
+CMD ["./main"]
