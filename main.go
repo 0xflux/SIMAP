@@ -46,7 +46,7 @@ func handleConnection(conn net.Conn) {
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {
-			log.Printf("Error reading from connection, %v\n", err)
+			// log.Printf("Error reading from connection, %v\n", err)
 			return
 		}
 
@@ -117,6 +117,6 @@ func processData(args string, writer *bufio.Writer) {
 		return
 	}
 
-	log.Printf("Processed data: %v\n", string(decoded))
+	log.Printf("\n\n*****************\nProcessed data:\n%v\n", string(decoded))
 	sendResponse(writer, "OK Data processed successfully")
 }
