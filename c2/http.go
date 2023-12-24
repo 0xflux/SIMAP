@@ -11,6 +11,7 @@ func ListenForHTTP() {
 	// serve payload
 	// choosing index.php as an example, but you can make this endpoint whatever you like
 	http.HandleFunc("/index.php", func(w http.ResponseWriter, r *http.Request) {
+
 		filename := "ZestyChips.exe"                                                             // file to serve
 		ua := "Mozilla/5.0 (Windows NT 10.0; Wln64; x64; rv:121.0) Gecko/20100101 Firefox/121.0" // spot the typo?
 
