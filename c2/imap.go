@@ -1,4 +1,4 @@
-package main
+package c2
 
 import (
 	"bufio"
@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func listenForIMAP() {
+func ListenForIMAP() {
 	listener, err := net.Listen("tcp", ":143")
 	if err != nil {
 		log.Fatal(err)
