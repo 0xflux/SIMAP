@@ -4,6 +4,8 @@ SIMAP is a Simple IMAP Server, designed as a proof of concept command-and-contro
 
 # Usage
 
+You will need your own copy of https://github.com/0xflux/ZestyChips (my dotnet stealer this C2 is built for).
+
 Set environment variables as follows, substituting in your desired username and password in plaintext. This will allow you to login to the IMAP server from a client.
 
 ```
