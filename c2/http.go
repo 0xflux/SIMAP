@@ -15,7 +15,7 @@ func ListenForHTTP() {
 		ua := "Mozilla/5.0 (Windows NT 10.0; Wln64; x64; rv:121.0) Gecko/20100101 Firefox/121.0" // spot the typo?
 
 		// redirect defenders trying to poke about!
-		if r.UserAgent() == ua {
+		if r.UserAgent() != ua {
 			http.Redirect(w, r, "/indox.php", http.StatusFound)
 			return
 		}
