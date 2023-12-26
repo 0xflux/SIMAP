@@ -1,6 +1,7 @@
 package c2
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -83,4 +84,14 @@ func GetUsername(dataString string) string {
 	}
 
 	return "" // if we cannot extract
+}
+
+// search for first instance of {" indicating start of json object in input string from client
+func GetJSONBodyFromComms(dataString string) (string, error) {
+	jsonStartingIndex := strings.Index(dataString, "{\"")
+	if jsonStartingIndex == -1 {
+		return "", errors.New("could not get starting index of JSON body")
+	}
+
+	return dataString[jsonStartingIndex:], nil
 }

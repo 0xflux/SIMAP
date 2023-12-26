@@ -119,16 +119,13 @@ func processData(args string, writer *bufio.Writer) {
 	// search for the username from the client computer
 	username := GetUsername(dataString)
 
-	// search for first instance of {" indicating start of json object in input string from client
-
-	jsonStartingIndex := strings.Index(dataString, "{\"")
-	if jsonStartingIndex == -1 {
+	// process the JSON in an easy to use format for the c2 operator
+	jsonString, err := GetJSONBodyFromComms(dataString)
+	if err != nil {
 		sendResponse(writer, "BAD Error in finding json substring, probably empty.")
 		return
 	}
 
-	// process the JSON in an easy to use format for the c2 operator
-	jsonString := dataString[jsonStartingIndex:]
 	var jsonObject map[string]interface{}
 
 	err = json.Unmarshal([]byte(jsonString), &jsonObject)
